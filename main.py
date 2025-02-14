@@ -1,6 +1,9 @@
 from fastapi import FastAPI
-from utils import executar_prompt
-from utils import obter_logger_e_configuracao
+from utils import (
+    obter_logger_e_configuracao, 
+    converter_pdf_para_texto_pyPDF2, 
+    resumir_pdf_llm
+)
 
 
 logger = obter_logger_e_configuracao()
@@ -26,17 +29,21 @@ app = FastAPI(
     },  
 )
 
+@app.post(
+    "/v1/converter_pdf_para_texto_pyPDF2", 
+    summary="Converte um PDF para texto",
+    description="Extrai o texto de um arquivo PDF usando PyPDF2."
+)
+def converter_pdf(caminho_pdf: str):
+    texto_extraido = converter_pdf_para_texto_pyPDF2(caminho_pdf)
+    return {"texto": texto_extraido}
+
 
 @app.post(
-    "/v1/gerar_historia",
-    summary="Gera uma história sobre o tema informado por parâmetro",
-    description="Gera uma história em português brasileiro sobre um tema específico usando a API Groq.",
+    "/v1/converter_pdf_xml_resumo", 
+    summary="Converte um PDF para XML e gera um resumo didático",
+    description="Extrai o texto do PDF, converte para um formato XML e produz um resumo estruturado em tópicos utilizando a LLM (Groq)."
 )
-def gerar_historia(tema: str):
-    logger.info(f"Tema informado: {tema}")
-
-    historia = executar_prompt(tema)
-    logger.info("História gerada com sucesso!")
-    ## logger.info(f"História gerada: {historia}")
-
-    return {"historia": historia}
+def converter_pdf_xml_resumo(caminho_pdf: str):
+    resultado = resumir_pdf_llm(caminho_pdf)
+    return resultado
