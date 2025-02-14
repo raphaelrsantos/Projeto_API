@@ -40,10 +40,10 @@ def converter_pdf(caminho_pdf: str):
 
 
 @app.post(
-    "/v1/converter_pdf_xml_resumo", 
-    summary="Converte um PDF para XML e gera um resumo didático",
-    description="Extrai o texto do PDF, converte para um formato XML e produz um resumo estruturado em tópicos utilizando a LLM (Groq)."
+    "/v1/pdf_resumo_groq", 
+    summary="Gera um resumo do PDF utilizando Groq como LLM.",
+    description="Extrai o texto do PDF e produz um resumo estruturado em tópicos utilizando a Groq como LLM."
 )
-def converter_pdf_xml_resumo(caminho_pdf: str):
+def resumir_pdf(caminho_pdf: str):
     resultado = resumir_pdf_llm(caminho_pdf)
     return resultado

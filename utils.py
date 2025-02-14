@@ -1,9 +1,8 @@
 import logging
 from dotenv import load_dotenv
 import os
-from groq import Groq
-import PyPDF2  # novo: biblioteca para manipulação de PDFs
-from groq import APIStatusError  # nova importação para tratar erros da API
+from groq import Groq, APIStatusError
+import PyPDF2  # biblioteca para manipulação de PDFs
 
 
 load_dotenv()
@@ -93,8 +92,9 @@ def resumir_xml(txt_xml: str) -> str:
     """ 
     prompt = (
         "A partir do seguinte conteúdo XML, crie um resumo didático e estruturado em tópicos. "
-        "O resumo deve ser claro, objetivo e facilitar a compreensão para o usuário final. Coloque quebra de linhas no resumo.\n\n"
-        f"Conteúdo XML:\n{txt_xml}"
+        "O resumo deve ser claro, objetivo e facilitar a compreensão para o usuário final. Coloque quebra de linhas no resumo. "
+        "Não exicitar a palavra resumo no corpo da resposta\n\n"
+        f"Conteúdo XML:\n{txt_xml}" 
     )
     
     client = Groq(
@@ -116,8 +116,7 @@ def resumir_xml(txt_xml: str) -> str:
         else:
             return f"Erro ao gerar resumo: {e}"
     
-    resumo = resposta.choices[0].message.content.strip()
-    return resumo
+    resumo = resposta.choices[0].message.content
 
 def resumir_pdf_llm(caminho_pdf: str) -> dict:
     """
