@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from utils import (
     obter_logger_e_configuracao, 
     converter_pdf_para_texto_pyPDF2, 
-    resumir_pdf_llm
+    resumir_pdf_groq
 )
 
 
@@ -45,5 +45,5 @@ def converter_pdf(caminho_pdf: str):
     description="Extrai o texto do PDF e produz um resumo estruturado em tópicos utilizando a Groq como LLM."
 )
 def resumir_pdf(caminho_pdf: str):
-    resultado = resumir_pdf_llm(caminho_pdf)
+    resultado = resumir_pdf_groq(caminho_pdf)
     return resultado
