@@ -28,7 +28,7 @@ app = FastAPI(
 
 
 @app.post(
-    "/gerar_historia",
+    "/v1/gerar_historia",
     summary="Gera uma história sobre o tema informado por parâmetro",
     description="Gera uma história em português brasileiro sobre um tema específico usando a API Groq.",
 )
