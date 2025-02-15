@@ -27,3 +27,4 @@ class NomeGrupo(str, Enum):
 
     conversao = "Conversão de arquivos PDF para TXT"
     llm = "Manipulação de PDFs com LLM"
+    classificacao = "Modelos de classificação"

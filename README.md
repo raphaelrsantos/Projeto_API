@@ -29,7 +29,8 @@ Trabalho desenvolvido por Guilherme Lemes, Raphael Rodrigues e Thiago Santos.
 
    ```bash
    python -m venv venv
-   source venv/bin/activate  # No Windows, use `venv\Scripts\activate`
+   source venv/bin/activate  # Linux
+   venv\Scripts\activate # Windows
    ```
 
 3. Instale as dependências:
@@ -45,6 +46,7 @@ Trabalho desenvolvido por Guilherme Lemes, Raphael Rodrigues e Thiago Santos.
    ```properties
    GROQ_API_KEY=your_groq_api_key
    OPENAI_API_KEY=your_openai_api_key
+   API_KEY=your_key
    ```
 
 ## Execução

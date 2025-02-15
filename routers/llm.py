@@ -1,4 +1,4 @@
-from fastapi import Query, APIRouter, HTTPException
+from fastapi import Query, APIRouter, HTTPException, FastAPI
 from models import ModeloOpenAi, NomeGrupo
 from routers.conversoes import convert_pdf_txt_pypdf2
 from utils import limpar_json_formatado, obter_logger_e_configuracao
@@ -42,6 +42,7 @@ def resumir_pdf_groq(caminho_pdf: str) -> dict:
 
     # Verifica se a extensão do arquivo é .pdf
     if not caminho_pdf.lower().endswith(".pdf"):
+        logger.error(f"Erro: O arquivo fornecido não é um PDF.")
         raise HTTPException(
             status_code=400, detail="Erro: O arquivo fornecido não é um PDF."
         )
@@ -51,6 +52,7 @@ def resumir_pdf_groq(caminho_pdf: str) -> dict:
         texto_pdf = convert_pdf_txt_pypdf2(caminho_pdf)
 
         if not texto_pdf.strip():
+            logger.error("Erro: Nenhum texto foi extraído do PDF.")
             raise HTTPException(
                 status_code=400,
                 detail="Erro: Nenhum texto foi extraído do PDF. O arquivo pode estar corrompido ou ser um PDF baseado em imagem.",
@@ -278,3 +280,65 @@ def manipular_pdf_openai(
         content=instrucao_user, prompt=prompt_user, modelo=modelo_user
     )
     return {"resultado": resultado}
+
+
+
+# Classificador 
+@router.post(
+    "/v1/classificar_denuncia/",
+    summary="Classifica uma denúncia na área de atuação da Promotoria de Justiça usando um LLM.",
+    description="Classifica uma denúncia na área de atuação da Promotoria de Justiça de acordo com o caso.",
+    tags=[NomeGrupo.classificacao],
+)
+
+def classificar_denuncia(denuncia: str):
+    """
+    Classifica uma denúncia na área de atuação da Promotoria de Justiça usando o modelo gpt-4o-mini da OpenAi.
+    """
+    # Lista de áreas de atuação da Promotoria de Justiça (Exemplo)
+    AREAS_PROMOTORIA = [
+    "Direitos Humanos",
+    "Meio Ambiente",
+    "Crimes Contra a Ordem Tributária",
+    "Infância e Juventude",
+    "Saúde Pública",
+    "Patrimônio Público e Social",
+    "Violência Doméstica",
+    "Consumidor",
+    "Idoso e Pessoas com Deficiência",
+    "Criminal",
+]
+
+    # Verifica se a chave da API está configurada
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="Erro: A chave da API 'OPENAI_API_KEY' não foi encontrada.")
+
+    try:
+        # Inicializa o cliente OpenAI
+        client = openai.OpenAI(api_key=api_key)
+
+        # Prompt para a LLM classificar a denúncia
+        prompt = (
+            "Dado o seguinte relato de denúncia, classifique a área de atuação da Promotoria de Justiça mais apropriada.\n\n"
+            "Áreas disponíveis: " + ", ".join(AREAS_PROMOTORIA) + "\n\n"
+            "Denúncia:\n"
+            f"{denuncia}\n\n"
+            "Classifique a área de atuação de acordo com o caso e responda apenas com o nome da área."
+        )
+
+        resposta = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        area_classificada = resposta.choices[0].message.content.strip()
+
+        # Verifica se a resposta do modelo está dentro das áreas permitidas
+        if area_classificada not in AREAS_PROMOTORIA:
+            raise HTTPException(status_code=400, detail="Erro: O modelo não conseguiu classificar a denúncia corretamente.")
+
+        return {"denuncia": denuncia, "area_classificada": area_classificada}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao classificar a denúncia: {str(e)}")
