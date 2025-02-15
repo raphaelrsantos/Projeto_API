@@ -3,8 +3,10 @@ from utils import (
     obter_logger_e_configuracao, 
     converter_pdf_para_texto_pyPDF2, 
     resumir_pdf_groq,
-    resumir_pdf_openai
-)
+    resumir_pdf_openai,
+    manipular_pdf_openai
+    )
+from models import ModeloOpenAi 
 
 
 logger = obter_logger_e_configuracao()
@@ -41,8 +43,8 @@ def converter_pdf(caminho_pdf: str):
 
 @app.post(
     "/v1/pdf_resumo_groq", 
-    summary="Gera um resumo do PDF utilizando Groq como LLM.",
-    description="Extrai o texto do PDF e produz um resumo estruturado em tópicos utilizando a Groq como LLM.",
+    summary="Gera um resumo do PDF utilizando Groq como LLM - modelo llama-3.1-8b-instant.",
+    description="Extrai o texto do PDF e produz um resumo estruturado em tópicos utilizando a Groq como LLM - modelo llama-3.1-8b-instant.",
     tags=["Manipulação de PDFs"],
 )
 def resumir_pdf(caminho_pdf: str):
@@ -52,10 +54,27 @@ def resumir_pdf(caminho_pdf: str):
 
 @app.post(
     "/v1/pdf_resumo_openai", 
-    summary="Gera um resumo do PDF utilizando a OpenAI como LLM.",
-    description="Extrai o texto do PDF e produz um resumo estruturado em tópicos utilizando a OpenaAI como LLM.",
+    summary="Gera um resumo do PDF utilizando a OpenAI como LLM - modelo gpt-4o-mini.",
+    description="Extrai o texto do PDF e produz um resumo estruturado em tópicos utilizando a OpenaAI como LLM - modelo gpt-4o-mini.",
     tags=["Manipulação de PDFs"],
 )
 def resumir_pdf(caminho_pdf: str):
     resultado = resumir_pdf_openai(caminho_pdf)
     return resultado
+
+@app.post(
+    "/v1/pdf_manipulacao_openai", 
+    summary="Manipula um PDF utilizando a OpenAI como LLM.",
+    description="Executa qualquer tarefa de manipulação de PDF, conforme parâmetros informados pelo usuário, utilizando a OpenaAI como LLM.",
+    tags=["Manipulação de PDFs"],
+)
+def manipular_pdf(
+    caminho_pdf: str = fr"C:\Users\rapha\Downloads\15_11_25_482_32_Licen_a_para_tratamento_de_doen_a_em_pessoa_da_fam_lia_efetivo.pdf",
+    persona: str = "Você é um renomado professor que detém a técnica de montar esquemas e resumos arrebatadores para seus alunos.",
+    prompt: str = "Faça um resumo no modelo perguntas e respostas do texto contido no arquivo.", 
+    modelo: ModeloOpenAi = ModeloOpenAi.gpt_4o_mini  
+):
+    print(modelo.value * 20)
+    resultado = manipular_pdf_openai(caminho_pdf, persona, prompt, modelo.value)
+    return resultado
+

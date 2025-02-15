@@ -4,6 +4,7 @@ import os
 from groq import Groq, APIStatusError
 import PyPDF2  # biblioteca para manipulação de PDFs
 import openai
+from models import ModeloOpenAi 
 
 load_dotenv()
 
@@ -151,6 +152,27 @@ def resumir_pdf_openai(caminho_pdf: str) -> str:
     prompt_user = ("A partir do conteúdo txt extraído do PDF, crie um resumo esquemático e o mais didático possível. Ao final do resumo, "
         "O resumo deve ser em português, claro, objetivo e facilitar a compreensão para o usuário final. Coloque quebra de linhas no resumo. "
         "Não explicitar a palavra resumo no corpo da resposta\n\n"
+        f"Texto extraído:\n{texto_pdf}"
+        ""
+    )
+    
+    resultado = acessar_api_openai(content=instrucao_user, prompt=prompt_user, modelo=modelo_user)
+    return {"resultado": resultado}
+
+
+def manipular_pdf_openai(caminho_pdf: str, persona: str, prompt: str, modelo: str) -> str:
+    """
+        Args:
+        caminho_pdf (str): O caminho para o arquivo PDF.
+    Returns:
+        str: O texto convertido para o padrão XML.
+    """
+    # Extrai o texto bruto do PDF
+    texto_pdf = converter_pdf_para_texto_pyPDF2(caminho_pdf)
+    
+    modelo_user = modelo
+    instrucao_user = persona
+    prompt_user = (f"A partir do conteúdo txt extraído do PDF, execute a tarefa solicitada no {prompt}. "
         f"Texto extraído:\n{texto_pdf}"
         ""
     )
