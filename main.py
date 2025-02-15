@@ -2,11 +2,14 @@ from fastapi import FastAPI, Query
 from utils import (
     obter_logger_e_configuracao, 
     converter_pdf_para_texto_pyPDF2, 
+    converter_pdf_para_texto_pdfplumber,
+    converter_pdf_para_texto_pymupdf,
+    converter_pdf_para_texto_pdf2image,
     resumir_pdf_groq,
     resumir_pdf_openai,
     manipular_pdf_openai
     )
-from models import ModeloOpenAi 
+from models import ModeloOpenAi, NomeGrupo
 
 
 
@@ -31,11 +34,10 @@ app = FastAPI(
 )
 
 @app.post(
-    "/v1/converter_pdf_para_texto_pyPDF2", 
+    "/v1/convert_pdf_text_pyPDF2", 
     summary="Converte um PDF para texto",
     description="Extrai o texto de um arquivo PDF usando a biblioteca PyPDF2 do Python.",
-    tags=["Conversão de arquivos"],
-    
+    tags=[NomeGrupo.conversao],
 )
 def converter_pdf(caminho_pdf: str):
     texto_extraido = converter_pdf_para_texto_pyPDF2(caminho_pdf)
@@ -43,10 +45,47 @@ def converter_pdf(caminho_pdf: str):
 
 
 @app.post(
+    "/v1/convert_pdf_text_pdfpluber", 
+    summary="Converte um PDF para texto usando o PDFPlumber",
+    description="Extrai o texto de um arquivo PDF usando a biblioteca PDFPlumber do Python.",
+    tags=[NomeGrupo.conversao],
+)
+def converter_pdf(caminho_pdf: str):
+    texto_extraido = converter_pdf_para_texto_pdfplumber(caminho_pdf)
+    return {"texto": texto_extraido}
+
+
+@app.post(
+    "/v1/convert_pdf_text_fitz", 
+    summary="Converte um PDF para texto usando o pymupdf (ou fitz)",
+    description="Extrai o texto de um arquivo PDF usando a biblioteca pymupdf (ou fitz) do Python.",
+    tags=[NomeGrupo.conversao], 
+)
+def converter_pdf(caminho_pdf: str):
+    texto_extraido = converter_pdf_para_texto_pymupdf(caminho_pdf)
+    return {"texto": texto_extraido}
+
+
+@app.post(
+    "/v1/convert_pdf_ocr_text_pdf2image", 
+    summary="Converte um PDF escaneado (OCR) para texto usando o pdf2image",
+    description="Extrai o texto de um arquivo PDF escaneado (OCR) usando a biblioteca pdf2image do Python."
+    "Para funcionar, é necessário ter o Tesseract instalado e configurado no sistema operacional, além "
+    "do diretório poppler baixado na máquina. É necessário também a inclusão dos caminhos do poppler e do Tesseract "
+    "nas variáveis de ambiente/sistema.",
+    tags=[NomeGrupo.conversao],
+)
+def converter_pdf(caminho_pdf: str):
+    texto_extraido = converter_pdf_para_texto_pdf2image(caminho_pdf)
+    return {"texto": texto_extraido}
+
+
+# Utilizando a Groq como LLM
+@app.post(
     "/v1/pdf_resumo_groq", 
     summary="Gera um resumo do PDF utilizando Groq como LLM - modelo llama-3.1-8b-instant.",
     description="Extrai o texto do PDF e produz um resumo estruturado em tópicos utilizando a Groq como LLM - modelo llama-3.1-8b-instant.",
-    tags=["Manipulação de PDFs"],
+    tags=[NomeGrupo.llm],
 )
 def resumir_pdf(caminho_pdf: str):
     resultado = resumir_pdf_groq(caminho_pdf)
@@ -57,7 +96,7 @@ def resumir_pdf(caminho_pdf: str):
     "/v1/pdf_resumo_openai", 
     summary="Gera um resumo do PDF utilizando a OpenAI como LLM - modelo gpt-4o-mini.",
     description="Extrai o texto do PDF e produz um resumo estruturado em tópicos utilizando a OpenaAI como LLM - modelo gpt-4o-mini.",
-    tags=["Manipulação de PDFs"],
+    tags=[NomeGrupo.llm],
 )
 def resumir_pdf(caminho_pdf: str):
     resultado = resumir_pdf_openai(caminho_pdf)
@@ -67,7 +106,7 @@ def resumir_pdf(caminho_pdf: str):
     "/v1/pdf_manipulacao_openai", 
     summary="Manipula um PDF utilizando a OpenAI como LLM.",
     description="Executa qualquer tarefa de manipulação de PDF, conforme parâmetros informados pelo usuário, utilizando a OpenaAI como LLM.",
-    tags=["Manipulação de PDFs"],
+    tags=[NomeGrupo.llm],
 )
 def manipular_pdf(
     # caminho_pdf: str = fr"C:\Users\rapha\Downloads\15_11_25_482_32_Licen_a_para_tratamento_de_doen_a_em_pessoa_da_fam_lia_efetivo.pdf",

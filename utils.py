@@ -4,6 +4,10 @@ import os
 from groq import Groq, APIStatusError
 import PyPDF2  # biblioteca para manipulação de PDFs
 import openai
+import pdfplumber
+import fitz # pymupdf
+from pdf2image import convert_from_path
+import pytesseract
 
 load_dotenv()
 
@@ -49,6 +53,52 @@ def converter_pdf_para_texto_pyPDF2(caminho_pdf: str) -> str:
     
     return texto
 
+
+def converter_pdf_para_texto_pdfplumber(caminho_pdf: str) -> str:
+    """
+    Converte um arquivo PDF para texto usando pdfplumber.
+
+    Args:
+        caminho_pdf (str): O caminho para o arquivo PDF.
+    Returns:
+        str: O texto extraído do arquivo PDF.
+    """
+    texto = ""
+    with pdfplumber.open(caminho_pdf) as pdf:
+        for pagina in pdf.pages:
+            texto += pagina.extract_text() + "\n"
+    return texto
+
+
+def converter_pdf_para_texto_pymupdf(caminho_pdf: str) -> str:
+    """
+    Converte um arquivo PDF para texto usando pymupdf (ou fitz).
+
+    Args:
+        caminho_pdf (str): O caminho para o arquivo PDF.
+    Returns:
+        str: O texto extraído do arquivo PDF.
+    """
+    doc = fitz.open(caminho_pdf)
+    texto = "\n".join([pagina.get_text() for pagina in doc])
+    return texto
+
+
+def converter_pdf_para_texto_pdf2image(caminho_pdf: str) -> str:
+    """
+    Converte um arquivo PDF digitalizado para texto usando pdf2image.
+
+    Args:
+        caminho_pdf (str): O caminho para o arquivo PDF.
+    Returns:
+        str: O texto extraído do arquivo PDF.
+    """
+    imagens = convert_from_path(caminho_pdf)
+    texto = "\n".join([pytesseract.image_to_string(imagem) for imagem in imagens])
+    return texto
+
+
+# Utilizando a Groq como LLM
 def resumir_pdf_groq(caminho_pdf: str) -> str:
     """
     Converte um PDF para TXT estruturado com tags XML utilizando uma LLM (Groq).
