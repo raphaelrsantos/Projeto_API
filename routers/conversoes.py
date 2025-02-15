@@ -1,4 +1,4 @@
-from fastapi import Query, APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 from models import NomeGrupo
 from utils import obter_logger_e_configuracao
 import os
@@ -12,13 +12,13 @@ logger = obter_logger_e_configuracao()
 
 router = APIRouter()
 
+
 @router.post(
     "/v1/convert_pdf_text_pypdf2",
     summary="Converte um PDF para texto - biblioteca PyPDF2",
     description="Extrai o texto de um arquivo PDF usando a biblioteca PyPDF2 do Python.",
     tags=[NomeGrupo.conversao],
 )
-
 def convert_pdf_txt_pypdf2(caminho_pdf: str) -> str:
     """
     Converte um arquivo PDF para texto usando PyPDF2.
@@ -63,16 +63,17 @@ def convert_pdf_txt_pypdf2(caminho_pdf: str) -> str:
             status_code=500, detail=f"Erro ao processar o PDF: {str(e)}"
         )
 
+
 @router.post(
     "/v1/convert_pdf_text_pdfplumber",
     summary="Converte um PDF para texto usando o PDFPlumber",
     description="Extrai o texto de um arquivo PDF usando a biblioteca PDFPlumber do Python.",
     tags=[NomeGrupo.conversao],
 )
-
 def converter_pdf_pdfplumber(caminho_pdf: str):
     texto_extraido = convert_pdf_text_pdfplumber(caminho_pdf)
     return {"texto": texto_extraido}
+
 
 def convert_pdf_text_pdfplumber(caminho_pdf: str) -> str:
     """
@@ -131,10 +132,10 @@ def convert_pdf_text_pdfplumber(caminho_pdf: str) -> str:
     description="Extrai o texto de um arquivo PDF usando a biblioteca pymupdf (ou fitz) do Python.",
     tags=[NomeGrupo.conversao],
 )
-
 def converter_pdf_pymupdf(caminho_pdf: str):
     texto_extraido = convert_pdf_text_pdfplumber(caminho_pdf)
     return {"texto": texto_extraido}
+
 
 def convert_pdf_text_pymupdf(caminho_pdf: str) -> str:
     """
@@ -199,6 +200,7 @@ def converter_pdf_pdf2image(caminho_pdf: str):
     texto_extraido = convert_pdf_text_pdf2image(caminho_pdf)
     return {"texto": texto_extraido}
 
+
 def convert_pdf_text_pdf2image(caminho_pdf: str) -> str:
     """
     Converte um arquivo PDF digitalizado para texto usando pdf2image e OCR (pytesseract).
@@ -256,4 +258,3 @@ def convert_pdf_text_pdf2image(caminho_pdf: str) -> str:
         raise HTTPException(
             status_code=500, detail=f"Erro ao processar o PDF com OCR: {str(e)}"
         )
-        

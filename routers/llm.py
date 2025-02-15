@@ -3,13 +3,13 @@ from models import ModeloOpenAi, NomeGrupo
 from routers.conversoes import convert_pdf_txt_pypdf2
 from utils import limpar_json_formatado, obter_logger_e_configuracao
 import os
-from models import ModeloOpenAi, NomeGrupo
 from groq import Groq, APIStatusError
 import openai
 
 logger = obter_logger_e_configuracao()
 
 router = APIRouter()
+
 
 # Utilizando a Groq como LLM
 @router.post(
@@ -21,6 +21,7 @@ router = APIRouter()
 def resumir_pdf_llm_groq(caminho_pdf: str):
     resultado = resumir_pdf_groq(caminho_pdf)
     return resultado
+
 
 def resumir_pdf_groq(caminho_pdf: str) -> dict:
     """
@@ -194,7 +195,6 @@ def acessar_api_openai(content: str, prompt: str, modelo: str) -> str:
     description="Extrai o texto do PDF e produz um resumo estruturado em tópicos utilizando a OpenaAI como LLM - modelo gpt-4o-mini.",
     tags=[NomeGrupo.llm],
 )
-
 def resumir_pdf_openai(caminho_pdf: str) -> str:
     """
     Converte um PDF para TXT estruturado com tags XML utilizando uma LLM (OPenAI).
@@ -248,11 +248,15 @@ def manipular_pdf_llm_openai(
         title="Prompt",
         description="Prompt a ser executado pela IA.",
     ),
-    modelo: ModeloOpenAi = ModeloOpenAi.gpt_4o_mini,):
+    modelo: ModeloOpenAi = ModeloOpenAi.gpt_4o_mini,
+):
     resultado = manipular_pdf_openai(caminho_pdf, persona, prompt, modelo.value)
     return resultado
 
-def manipular_pdf_openai(caminho_pdf: str, persona: str, prompt: str, modelo: str) -> str:
+
+def manipular_pdf_openai(
+    caminho_pdf: str, persona: str, prompt: str, modelo: str
+) -> str:
     """
         Args:
         caminho_pdf (str): O caminho para o arquivo PDF.
@@ -261,13 +265,16 @@ def manipular_pdf_openai(caminho_pdf: str, persona: str, prompt: str, modelo: st
     """
     # Extrai o texto bruto do PDF
     texto_pdf = convert_pdf_txt_pypdf2(caminho_pdf)
-    
+
     modelo_user = modelo
     instrucao_user = persona
-    prompt_user = (f"A partir do conteúdo txt extraído do PDF, execute a tarefa solicitada no {prompt}. "
+    prompt_user = (
+        f"A partir do conteúdo txt extraído do PDF, execute a tarefa solicitada no {prompt}. "
         f"Texto extraído:\n{texto_pdf}"
         ""
     )
-    
-    resultado = acessar_api_openai(content=instrucao_user, prompt=prompt_user, modelo=modelo_user)
+
+    resultado = acessar_api_openai(
+        content=instrucao_user, prompt=prompt_user, modelo=modelo_user
+    )
     return {"resultado": resultado}

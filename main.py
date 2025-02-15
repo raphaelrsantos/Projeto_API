@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Depends
 from routers import conversoes, llm
+from utils import commom_verificacao_api_token
 
 description = """
     API desenvolvida para o trabalho final da disciplina de API.
@@ -16,6 +17,9 @@ app = FastAPI(
         "url": "http://github.com/raphaelrsantos/",
         "email": "raphaelrsantos@gmail.com",
     },
+    dependencies=[
+        Depends(commom_verificacao_api_token)
+    ],  # com essa linha, o token é verificado em todas as requisições, ja que busca a função commom_verificacao_api_token
 )
 
 app.include_router(conversoes.router)

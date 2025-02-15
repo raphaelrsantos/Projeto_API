@@ -1,7 +1,31 @@
 import logging
+from fastapi import HTTPException, Header
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
+
+API_TOKEN = os.getenv("API_TOKEN")
+if API_TOKEN is None:
+    raise ValueError("API_TOKEN não encontrado no arquivo .env")
+API_TOKEN = int(API_TOKEN)
+
+
+def commom_verificacao_api_token(
+    x_api_token: int = Header(...),
+):  # Alterando a assinatura
+    """
+    Verifica se o token da API fornecido no header 'x-api-token' é válido.
+
+    Args:
+        x_api_token (int): O token da API fornecido via header.
+
+    Raises:
+        HTTPException: Se o token da API for inválido, é levantada uma exceção HTTP 401.
+    """
+    if x_api_token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+
 
 def obter_logger_e_configuracao():
     """
@@ -16,7 +40,9 @@ def obter_logger_e_configuracao():
     logger = logging.getLogger("fastapi")
     return logger
 
+
 logger = obter_logger_e_configuracao()
+
 
 def limpar_json_formatado(json_text):
     """
