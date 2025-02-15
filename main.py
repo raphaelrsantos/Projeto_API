@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from utils import (
     obter_logger_e_configuracao, 
     converter_pdf_para_texto_pyPDF2, 
@@ -7,6 +7,7 @@ from utils import (
     manipular_pdf_openai
     )
 from models import ModeloOpenAi 
+
 
 
 logger = obter_logger_e_configuracao()
@@ -69,12 +70,19 @@ def resumir_pdf(caminho_pdf: str):
     tags=["Manipulação de PDFs"],
 )
 def manipular_pdf(
-    caminho_pdf: str = fr"C:\Users\rapha\Downloads\15_11_25_482_32_Licen_a_para_tratamento_de_doen_a_em_pessoa_da_fam_lia_efetivo.pdf",
-    persona: str = "Você é um renomado professor que detém a técnica de montar esquemas e resumos arrebatadores para seus alunos.",
-    prompt: str = "Faça um resumo no modelo perguntas e respostas do texto contido no arquivo.", 
+    # caminho_pdf: str = fr"C:\Users\rapha\Downloads\15_11_25_482_32_Licen_a_para_tratamento_de_doen_a_em_pessoa_da_fam_lia_efetivo.pdf",
+    caminho_pdf: str = Query(..., title="Caminho para o arquivo PDF", description="O caminho para o arquivo PDF."),
+    persona: str = Query("Você é um renomado professor com bastante experiência em montagem de esquemas e "
+                         "resumos extremamente atrativos para seus alunos.", 
+                         title="Persona", 
+                         description="Personagem que a IA se tornará para execução da tarefa.", 
+                         ),
+    prompt: str = Query("Faça um resumo no modelo perguntas e respostas do texto contido no arquivo.", 
+                         title="Prompt", 
+                         description="Prompt a ser executado pelaIA.", 
+                         ), 
     modelo: ModeloOpenAi = ModeloOpenAi.gpt_4o_mini  
 ):
-    print(modelo.value * 20)
     resultado = manipular_pdf_openai(caminho_pdf, persona, prompt, modelo.value)
     return resultado
 

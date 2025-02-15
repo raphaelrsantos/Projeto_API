@@ -4,7 +4,6 @@ import os
 from groq import Groq, APIStatusError
 import PyPDF2  # biblioteca para manipulação de PDFs
 import openai
-from models import ModeloOpenAi 
 
 load_dotenv()
 
