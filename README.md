@@ -1,4 +1,4 @@
-🚀 ## Projeto_API
+## Projeto_API
 
 Projeto final da disciplina de API do curso de pós-graduação da UFG em Sistemas e Agentes Inteligentes.
 Desenvolvido por Guilherme Lemes, Raphael Rodrigues e Thiago Santos.
@@ -6,15 +6,16 @@ Desenvolvido por Guilherme Lemes, Raphael Rodrigues e Thiago Santos.
 ## Requisitos 📌
 
 ✔️ Python 3.10+
-🚀 FastAPI [standard]
-📄 PyPDF2
-🔍 pdfplumber
-📜 pymupdf (fitz)
-🖼️ pdf2image
-🧠 pytesseract
-🛠️ openai
-🤖 groq
-📦 dotenv
+
+- FastAPI [standard]
+- PyPDF2
+- pdfplumber
+- pymupdf (fitz)
+- pdf2image
+- pytesseract
+- openai
+- groq
+- dotenv
 
 ## Instalação 🔧
 
